@@ -31,9 +31,10 @@ WORKDIR /app
 ENV COMPOSER_ALLOW_SUPERUSER=1 \
     MAIL_MAILER=log
 
-# Install dependencies first to maximise layer caching.
-COPY composer.json composer.lock ./
-RUN composer install --no-interaction --prefer-dist --no-scripts --no-autoloader
+# Install dependencies first to maximise layer caching. The package does not
+# commit composer.lock (library convention), so resolve like CI does.
+COPY composer.json ./
+RUN composer update --no-interaction --prefer-dist --no-scripts --no-autoloader
 
 COPY package.json package-lock.json ./
 RUN npm ci
