@@ -17,6 +17,9 @@ services:
     ports:
       - "8000:8000"
     environment:
+      # Absolute URLs in emails are built from APP_URL (there is no request
+      # context when queued mail renders), so it must include the mapped port.
+      APP_URL: http://localhost:8000
       MAIL_MAILER: smtp
       MAIL_HOST: mailpit
       MAIL_PORT: 1025
