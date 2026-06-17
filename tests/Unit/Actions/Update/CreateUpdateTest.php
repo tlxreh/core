@@ -5,9 +5,11 @@ use Cachet\Data\Requests\IncidentUpdate\CreateIncidentUpdateRequestData;
 use Cachet\Data\Requests\ScheduleUpdate\CreateScheduleUpdateRequestData;
 use Cachet\Enums\ComponentStatusEnum;
 use Cachet\Enums\IncidentStatusEnum;
+use Cachet\Events\Incidents\IncidentUpdateCreated;
 use Cachet\Models\Component;
 use Cachet\Models\Incident;
 use Cachet\Models\Schedule;
+use Illuminate\Support\Facades\Event;
 
 it('can create an incident update', function () {
     $incident = Incident::factory()->create();
@@ -77,4 +79,36 @@ it('can create a schedule update', function () {
 
     expect($incidentUpdate)
         ->message->toBe($data->message);
+});
+
+it('dispatches IncidentUpdateCreated when updating an incident', function () {
+    Event::fake();
+
+    $incident = Incident::factory()->create();
+
+    $data = CreateIncidentUpdateRequestData::from([
+        'message' => 'This is an update message.',
+        'status' => IncidentStatusEnum::investigating,
+    ]);
+
+    $update = app(CreateUpdate::class)->handle($incident, $data);
+
+    Event::assertDispatched(IncidentUpdateCreated::class, function (IncidentUpdateCreated $event) use ($incident, $update) {
+        return $event->incident->is($incident) && $event->update->is($update);
+    });
+});
+
+it('does not dispatch IncidentUpdateCreated when updating a schedule', function () {
+    Event::fake();
+
+    $schedule = Schedule::factory()->create();
+
+    $data = CreateScheduleUpdateRequestData::from([
+        'message' => 'This is an update message for a schedule.',
+        'status' => IncidentStatusEnum::investigating,
+    ]);
+
+    app(CreateUpdate::class)->handle($schedule, $data);
+
+    Event::assertNotDispatched(IncidentUpdateCreated::class);
 });

@@ -7,6 +7,7 @@ use Cachet\Http\Controllers\HealthController;
 use Cachet\Http\Controllers\RssController;
 use Cachet\Http\Controllers\Setup\SetupController;
 use Cachet\Http\Controllers\StatusPage\StatusPageController;
+use Cachet\Http\Controllers\StatusPage\SubscriberController;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 
@@ -36,7 +37,12 @@ class PendingRouteRegistration
                 $router->get('/setup', [SetupController::class, 'index'])->name('setup.index');
                 $router->post('/setup', [SetupController::class, 'store'])->name('setup.store');
 
-                // @todo subscription routes... subscribe, manage subscriptions, unsubscribe
+                $router->get('/subscribe', [SubscriberController::class, 'showSubscribeForm'])->name('subscriber.subscribe');
+                $router->post('/subscribe', [SubscriberController::class, 'subscribe'])->middleware('throttle:cachet-subscribe')->name('subscriber.subscribe.store');
+                $router->get('/subscriber/verify/{verifyCode}', [SubscriberController::class, 'verify'])->name('subscriber.verify');
+                $router->get('/subscriber/manage/{verifyCode}', [SubscriberController::class, 'showManageForm'])->name('subscriber.manage');
+                $router->put('/subscriber/manage/{verifyCode}', [SubscriberController::class, 'updateSubscriptions'])->name('subscriber.manage.update');
+                $router->delete('/subscriber/unsubscribe/{verifyCode}', [SubscriberController::class, 'unsubscribe'])->name('subscriber.unsubscribe');
 
                 $router->get('/health', HealthController::class)->name('health');
 

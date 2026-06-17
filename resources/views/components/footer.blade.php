@@ -1,5 +1,12 @@
-@if ($showSupport || $showTimezone)
+@if ($showSupport || $showTimezone || $subscriberNotificationsEnabled)
 <footer class="flex flex-col items-center justify-center gap-2 border-t px-8 py-6 text-center text-sm tracking-tight text-zinc-500 dark:text-zinc-400 dark:border-zinc-700">
+    @if($subscriberNotificationsEnabled)
+    <div class="flex items-center justify-center gap-2">
+        <a href="{{ route('cachet.subscriber.subscribe') }}" class="font-semibold transition hover:opacity-80">
+            {{ __('cachet::subscriber.subscribe.title') }}
+        </a>
+    </div>
+    @endif
     @if($showSupport)
     <div class="flex items-center justify-center gap-2">
         {{ __('cachet::cachet.powered_by') }}

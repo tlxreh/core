@@ -25,8 +25,6 @@ class CreateIncident
             $data = $data->withMessage($this->parseTemplate($template, $data));
         }
 
-        // @todo Dispatch notification that incident was created.
-
         return tap(Incident::create(array_merge(
             ['guid' => Str::uuid()],
             $data->except('components')->toArray()

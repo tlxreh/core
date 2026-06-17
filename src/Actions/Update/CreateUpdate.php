@@ -6,6 +6,7 @@ use Cachet\Data\Requests\IncidentUpdate\CreateIncidentUpdateRequestData;
 use Cachet\Data\Requests\ScheduleUpdate\CreateScheduleUpdateRequestData;
 use Cachet\Enums\ComponentStatusEnum;
 use Cachet\Enums\IncidentStatusEnum;
+use Cachet\Events\Incidents\IncidentUpdateCreated;
 use Cachet\Models\Incident;
 use Cachet\Models\Schedule;
 use Cachet\Models\Update;
@@ -25,7 +26,9 @@ class CreateUpdate
             $this->updateComponentsToOperational($resource);
         }
 
-        // @todo Dispatch notification that incident was updated.
+        if ($resource instanceof Incident) {
+            IncidentUpdateCreated::dispatch($resource, $update);
+        }
 
         return $update;
     }

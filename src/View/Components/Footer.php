@@ -28,6 +28,7 @@ class Footer extends Component
             'cachetVersion' => Cachet::version(),
             'showTimezone' => $this->appSettings->show_timezone,
             'timezone' => $this->appSettings->timezone,
+            'subscriberNotificationsEnabled' => $this->appSettings->subscriber_notifications_enabled,
         ]);
     }
 }

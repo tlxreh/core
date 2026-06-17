@@ -134,6 +134,19 @@ return [
 
     /*
      |--------------------------------------------------------------------------
+     | Cachet Notifications
+     |--------------------------------------------------------------------------
+     |
+     | Configure how Cachet queues subscriber email notifications.
+     |
+     */
+    'notifications' => [
+        'queue_connection' => env('CACHET_NOTIFICATION_QUEUE_CONNECTION', null),
+        'queue_name' => env('CACHET_NOTIFICATION_QUEUE_NAME', 'notifications'),
+    ],
+
+    /*
+     |--------------------------------------------------------------------------
      | Cachet Supported Locales
      |--------------------------------------------------------------------------
      |

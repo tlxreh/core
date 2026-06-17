@@ -90,6 +90,8 @@ class ManageCachet extends SettingsPage
                             ->label(__('cachet::settings.manage_cachet.toggles.display_graphs')),
                         Toggle::make('enable_external_dependencies')
                             ->label(__('cachet::settings.manage_cachet.toggles.enable_external_dependencies')),
+                        Toggle::make('subscriber_notifications_enabled')
+                            ->label(__('cachet::settings.manage_cachet.toggles.subscriber_notifications')),
                         Toggle::make('only_disrupted_days')
                             ->label(__('cachet::settings.manage_cachet.toggles.only_show_disrupted_days')),
                     ]),

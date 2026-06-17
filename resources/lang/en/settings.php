@@ -17,6 +17,7 @@ return [
             'show_dashboard_link' => 'Show Dashboard Link',
             'display_graphs' => 'Display Graphs',
             'enable_external_dependencies' => 'Enable External Dependencies',
+            'subscriber_notifications' => 'Enable Subscriber Notifications',
             'only_show_disrupted_days' => 'Only Show Disrupted Days',
             'recent_incidents_only' => 'Show Recent Incidents Only',
             'recent_incidents_days' => 'Number of Days to Show Recent Incidents',

@@ -7,6 +7,9 @@ use Cachet\Commands\MakeUserCommand;
 use Cachet\Commands\SendBeaconCommand;
 use Cachet\Commands\VersionCommand;
 use Cachet\Database\Seeders\DatabaseSeeder;
+use Cachet\Events\Subscribers\SubscriberCreated;
+use Cachet\Listeners\SendSubscriberNotificationListener;
+use Cachet\Listeners\SendVerificationEmailListener;
 use Cachet\Listeners\SendWebhookListener;
 use Cachet\Listeners\WebhookCallEventListener;
 use Cachet\Models\Incident;
@@ -82,6 +85,11 @@ class CachetCoreServiceProvider extends ServiceProvider
         ], SendWebhookListener::class);
         Event::listen([WebhookCallSucceededEvent::class, WebhookCallFailedEvent::class], WebhookCallEventListener::class);
 
+        Event::listen([
+            'Cachet\Events\Incidents\*',
+        ], SendSubscriberNotificationListener::class);
+        Event::listen(SubscriberCreated::class, SendVerificationEmailListener::class);
+
         Http::globalRequestMiddleware(fn ($request) => $request->withHeader(
             'User-Agent', Cachet::USER_AGENT
         ));
@@ -115,6 +123,8 @@ class CachetCoreServiceProvider extends ServiceProvider
             return Limit::perMinute(config('cachet.api_rate_limit', 300))
                 ->by($request->user()?->id ?: $request->ip());
         });
+
+        RateLimiter::for('cachet-subscribe', fn ($request) => Limit::perMinute(5)->by($request->ip()));
     }
 
     /**

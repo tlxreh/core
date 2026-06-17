@@ -11,6 +11,7 @@ enum WebhookEventEnum: string
 
     case incident_created = 'incident_created';
     case incident_updated = 'incident_updated';
+    case incident_update_created = 'incident_update_created';
     case incident_deleted = 'incident_deleted';
 
     case metric_created = 'metric_created';

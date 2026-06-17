@@ -38,6 +38,8 @@ class AppSettings extends Settings
 
     public bool $enable_external_dependencies = true;
 
+    public bool $subscriber_notifications_enabled = true;
+
     public static function group(): string
     {
         return 'app';
