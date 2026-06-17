@@ -14,7 +14,7 @@
     @if ($subscriberNotificationsEnabled || $dashboardLoginLink)
     <div class="flex items-center gap-2.5 sm:gap-5">
         @if ($subscriberNotificationsEnabled)
-        <a href="{{ route('cachet.subscriber.subscribe') }}" class="inline-flex items-center gap-2 rounded-sm bg-accent px-3.5 py-2 text-sm font-semibold text-accent-foreground transition hover:opacity-80">
+        <a href="{{ route('cachet.subscriber.subscribe') }}" class="inline-flex items-center gap-2 rounded-sm bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground transition hover:opacity-80">
             @svg('cachet-bell', 'size-4')
             {{ __('cachet::subscriber.subscribe.title') }}
         </a>
