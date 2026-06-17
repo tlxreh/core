@@ -1,0 +1,32 @@
+##
+# Local Cachet (core) test environment.
+#
+#   docker compose up --build
+#
+# Status page:  http://localhost:8000
+# Dashboard:    http://localhost:8000/dashboard   (test@test.com / test123)
+# Mailpit UI:   http://localhost:8025             (captured emails)
+#
+# This runs the package's Workbench/Testbench app on SQLite with a synchronous
+# queue — intended for testing and demos, not production.
+##
+services:
+  cachet:
+    build: .
+    image: ghcr.io/tlxreh/core:dev
+    ports:
+      - "8000:8000"
+    environment:
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+    depends_on:
+      - mailpit
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    restart: unless-stopped

@@ -1,0 +1,11 @@
+.git
+.github
+vendor
+node_modules
+public/build
+public/vendor
+workbench/database/*.sqlite
+**/*.sqlite
+.idea
+.vscode
+*.log
