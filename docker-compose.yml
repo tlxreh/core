@@ -26,6 +26,9 @@ services:
     depends_on:
       - mailpit
     restart: unless-stopped
+    volumes:
+      # Persist the SQLite database across container restarts/recreates.
+      - cachet-db:/app/vendor/orchestra/testbench-core/laravel/database
 
   mailpit:
     image: axllent/mailpit:latest
@@ -33,3 +36,6 @@ services:
       - "8025:8025"
       - "1025:1025"
     restart: unless-stopped
+
+volumes:
+  cachet-db:
