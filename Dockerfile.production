@@ -1,0 +1,70 @@
+# syntax=docker/dockerfile:1
+
+##
+# Production image for Cachet.
+#
+# Unlike the demo `Dockerfile` (which serves the package's Workbench app via the
+# PHP dev server), this builds the standalone `cachethq/cachet` Laravel
+# application and injects OUR `cachethq/core` fork (the subscriber-notifications
+# work) as the core dependency. It is served by php-fpm + nginx via the
+# serversideup base image.
+#
+#   docker build -f Dockerfile.production -t cachet:prod .
+#
+# Required runtime env (no .env is baked in):
+#   APP_KEY        base64 key (php artisan key:generate --show)
+#   APP_URL        e.g. https://status.timelog.com
+#   DB_CONNECTION  pgsql | mysql | sqlite ...   + DB_HOST/PORT/DATABASE/USERNAME/PASSWORD
+#   MAIL_MAILER    smtp (AWS SES) + MAIL_HOST/PORT/USERNAME/PASSWORD/ENCRYPTION + MAIL_FROM_ADDRESS
+#   QUEUE_CONNECTION  sync (no worker) or database/redis/sqs (requires a `queue:work` worker)
+#
+# Migrations + caches run automatically on boot (serversideup AUTORUN_*).
+##
+
+FROM serversideup/php:8.4-fpm-nginx
+
+USER root
+
+# Build tooling + the PHP extensions the app and Filament rely on.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/* \
+    && install-php-extensions intl bcmath gd pcntl pdo_pgsql pdo_mysql
+
+WORKDIR /var/www/html
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# Which fork/branch of cachethq/core to build against.
+ARG CORE_REPO=https://github.com/tlxreh/core.git
+ARG CORE_VERSION=dev-main
+
+# Fetch the standalone Cachet application (its default branch).
+RUN git clone --depth 1 https://github.com/cachethq/cachet.git .
+
+# Resolve cachethq/core from our fork (re-locks just that package), install
+# production dependencies, and publish the package + Filament assets. A throwaway
+# APP_KEY is exported only for these build-time artisan calls — the real key
+# comes from runtime env and is never baked into the image.
+RUN export APP_KEY="base64:$(head -c 32 /dev/urandom | base64)" \
+    && composer config repositories.cachet-core vcs "${CORE_REPO}" \
+    && composer require "cachethq/core:${CORE_VERSION}" --no-interaction \
+    && composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader \
+    && php artisan vendor:publish --tag=laravel-assets --force --ansi \
+    && php artisan vendor:publish --tag=cachet-assets --force --ansi \
+    && php artisan filament:assets --ansi \
+    && php artisan storage:link
+
+# Hand the app to the unprivileged runtime user.
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+USER www-data
+
+# Run migrations + cache config/routes/views on boot (handled by the base image).
+# Storage link is created at build time (public/ is root-owned), so it is
+# disabled here; migrations + optimisation run on boot.
+ENV PHP_OPCACHE_ENABLE=1 \
+    AUTORUN_ENABLED=true \
+    AUTORUN_LARAVEL_MIGRATION=true \
+    AUTORUN_LARAVEL_STORAGE_LINK=false \
+    AUTORUN_LARAVEL_OPTIMIZE=true
