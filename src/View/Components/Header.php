@@ -27,6 +27,7 @@ class Header extends Component
             'siteName' => $this->appSettings->name,
             'appBanner' => $this->themeSettings->app_banner,
             'dashboardLoginLink' => $this->appSettings->dashboard_login_link,
+            'subscriberNotificationsEnabled' => $this->appSettings->subscriber_notifications_enabled,
         ]);
     }
 }

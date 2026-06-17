@@ -10,6 +10,23 @@ beforeEach(function () {
     $this->withoutVite();
 });
 
+it('shows a prominent subscribe button on the status page header', function () {
+    $this->get(route('cachet.status-page'))
+        ->assertOk()
+        ->assertSee(route('cachet.subscriber.subscribe'), false)
+        ->assertSee(__('cachet::subscriber.subscribe.title'));
+});
+
+it('hides the subscribe button when notifications are disabled', function () {
+    $settings = app(AppSettings::class);
+    $settings->subscriber_notifications_enabled = false;
+    $settings->save();
+
+    $this->get(route('cachet.status-page'))
+        ->assertOk()
+        ->assertDontSee(route('cachet.subscriber.subscribe'), false);
+});
+
 it('shows the subscribe form', function () {
     $this->get(route('cachet.subscriber.subscribe'))
         ->assertOk()

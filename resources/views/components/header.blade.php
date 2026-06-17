@@ -11,9 +11,17 @@
         </a>
     </div>
 
-    @if ($dashboardLoginLink)
+    @if ($subscriberNotificationsEnabled || $dashboardLoginLink)
     <div class="flex items-center gap-2.5 sm:gap-5">
-        <a href="{{ Cachet\Cachet::dashboardPath() }}" class="rounded-sm bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground">
+        @if ($subscriberNotificationsEnabled)
+        <a href="{{ route('cachet.subscriber.subscribe') }}" class="inline-flex items-center gap-2 rounded-sm bg-accent px-3.5 py-2 text-sm font-semibold text-accent-foreground transition hover:opacity-80">
+            @svg('cachet-bell', 'size-4')
+            {{ __('cachet::subscriber.subscribe.title') }}
+        </a>
+        @endif
+
+        @if ($dashboardLoginLink)
+        <a href="{{ Cachet\Cachet::dashboardPath() }}" class="text-sm font-medium text-zinc-800 transition hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300 sm:text-base">
             {{ __('filament-panels::pages/dashboard.title') }}
         </a>
         @auth
@@ -25,6 +33,7 @@
             </button>
         </form>
         @endauth
+        @endif
     </div>
     @endif
 </div>
